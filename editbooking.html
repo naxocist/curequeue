@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Booking Information</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #e9c4ff, #abf7d7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 700px;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .booking-details, .additional-info, .upload-section {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+
+        .booking-details span {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .additional-info label, .upload-section label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .additional-info textarea, .upload-section select, .upload-section input[type="file"] {
+            width: calc(100% - 16px);
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            resize: vertical;
+            margin-bottom: 10px;
+        }
+
+        .upload-section button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        .upload-section button:hover {
+            background-color: #45a049;
+        }
+
+        .exit-button {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .exit-button a {
+            display: inline-block;
+            background-color: #f44336;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .exit-button a:hover {
+            background-color: #d32f2f;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 300px;
+            margin-top: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            object-fit: cover;
+        }
+    </style>
+    <!-- Include Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>ข้อมูลการจอง</h1>
+        <div class="booking-details" id="bookingDetails">
+            <!-- Booking details will be dynamically added here -->
+        </div>
+
+        <div class="additional-info" id="additionalInfo">
+            <label for="disease">โรค:</label>
+            <textarea id="disease" rows="4"></textarea>
+            <label for="advice">คำแนะนำ:</label>
+            <textarea id="advice" rows="4"></textarea>
+            <label for="status">สถานะ:</label>
+            <select id="status">
+                <option value="">เลือกสถานะ</option>
+                <option value="รอตรวจรอการตรวจจากแพทย์">รอการตรวจจากแพทย์</option>
+                <option value="เข้าพบแพทย์">เข้าพบแพทย์</option>
+                <option value="รอการตรวจรังสี">รอการตรวจรังสี</option>
+                <option value="รอการตรวจเลือด">รอการตรวจเลือด</option>
+                <option value="รอการตรวจปัสสาวะ">รอการตรวจปัสสาวะ</option>
+                <option value="ตรวจเสร็จสิ้น">ตรวจเสร็จสิ้น</option>
+                <option value="รอการชำระเงิน">รอการชำระเงิน</option>
+                <option value="ชำระเงินแล้ว">ชำระเงินแล้ว</option> <!-- เพิ่มตัวเลือกนี้ -->
+            </select>
+
+        </div>
+
+        <div class="upload-section" id="uploadSection">
+            <label for="imageSelect">เลือกภาพ:</label>
+            <select id="imageSelect"></select>
+            <input type="file" id="imageUpload" accept="image/*">
+            <button id="saveButton">บันทึกข้อมูล</button>
+            <img id="imagePreview" class="image-preview" style="display:none;" />
+        </div>
+
+        <div class="exit-button">
+            <a href="booklist.html">ออก</a>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import Firebase SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-database.js";
+        import { getStorage, ref as storageRef, listAll, getDownloadURL, uploadBytes } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-storage.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAp8cxB8EE02CYqf0d9KemDlVnUwRgx6No",
+            authDomain: "login-form-596e1.firebaseapp.com",
+            databaseURL: "https://login-form-596e1-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "login-form-596e1",
+            storageBucket: "login-form-596e1.appspot.com",
+            messagingSenderId: "911793008022",
+            appId: "1:911793008022:web:9ffd9fae871a2468f001b7"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const storage = getStorage(app);
+
+        // Get bookingId from URL query parameter
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const bookingId = urlParams.get('bookingId');
+
+        if (!bookingId) {
+            alert("Booking ID not provided.");
+            window.location.href = "homedoc.html"; // Redirect if no bookingId
+        }
+
+        // Reference to the specific booking
+        const bookingRef = ref(database, `queueBookings/${bookingId}`);
+
+        // Get the existing booking data and populate the view
+        onValue(bookingRef, (snapshot) => {
+            const bookingData = snapshot.val();
+            if (bookingData) {
+                const bookingDetailsContainer = document.getElementById('bookingDetails');
+                bookingDetailsContainer.innerHTML = `
+                    <span>Name:</span> ${bookingData.name}<br>
+                    <span>Birthdate:</span> ${bookingData.birthdate}<br>
+                    <span>Height:</span> ${bookingData.height}<br>
+                    <span>Weight:</span> ${bookingData.weight}<br>
+                    <span>Symptom:</span> ${bookingData.symptom}<br>
+                `;
+
+                // Check if additional info is already present
+                const diseaseInput = document.getElementById('disease');
+                const adviceInput = document.getElementById('advice');
+                const statusInput = document.getElementById('status');
+
+                diseaseInput.value = bookingData.disease || '';
+                adviceInput.value = bookingData.advice || '';
+                statusInput.value = bookingData.status || '';
+
+                // Show existing image if available
+                const imagePreview = document.getElementById('imagePreview');
+                if (bookingData.imageUrl) {
+                    imagePreview.src = bookingData.imageUrl;
+                    imagePreview.style.display = 'block';
+                } else {
+                    imagePreview.style.display = 'none';
+                }
+            } else {
+                alert("Booking not found.");
+                window.location.href = "homedoc.html"; // Redirect if booking not found
+            }
+        }, (error) => {
+            console.error("Error fetching booking data: ", error);
+            alert("Error fetching booking data.");
+            window.location.href = "homedoc.html"; // Redirect on error
+        });
+
+        // Load images from "hospitalmap" folder and populate the dropdown
+        const loadImages = async () => {
+            const imageSelect = document.getElementById('imageSelect');
+            const listRef = storageRef(storage, 'hospitalmap');
+            try {
+                const res = await listAll(listRef);
+                res.items.forEach(async (itemRef) => {
+                    const url = await getDownloadURL(itemRef);
+                    const option = document.createElement('option');
+                    option.value = url;
+                    option.text = itemRef.name;
+                    imageSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error listing images:', error);
+            }
+        };
+        loadImages();
+
+        // Handle save button click to save additional info and selected picture
+        document.getElementById('saveButton').addEventListener('click', async () => {
+            const disease = document.getElementById('disease').value;
+            const advice = document.getElementById('advice').value;
+            const status = document.getElementById('status').value;
+            const imageUrl = document.getElementById('imageSelect').value;
+
+            // Update additional info and picture URL in Firebase database
+            const updatedBooking = {
+                disease: disease,
+                advice: advice,
+                status: status,
+                imageUrl: imageUrl
+            };
+
+            update(bookingRef, updatedBooking)
+                .then(() => {
+                    alert('บันทึกข้อมูลเพิ่มเติมและรูปภาพเรียบร้อยแล้ว!');
+                    window.location.href = "booklist.html"; // Redirect to home page
+                })
+                .catch((error) => {
+                    console.error('Error updating booking:', error);
+                    alert('เกิดข้อผิดพลาดในการอัปเดตการจอง.');
+                });
+        });
+
+
+        // Handle image upload
+        document.getElementById('imageUpload').addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const storageRef = storage.ref();
+            const imageRef = storageRef.child(`hospitalmap/${file.name}`);
+
+            try {
+                await imageRef.put(file);
+                const imageUrl = await imageRef.getDownloadURL();
+
+                // Update image URL in the select dropdown and preview
+                const imageSelect = document.getElementById('imageSelect');
+                const option = document.createElement('option');
+                option.value = imageUrl;
+                option.text = file.name;
+                imageSelect.appendChild(option);
+
+                const imagePreview = document.getElementById('imagePreview');
+                imagePreview.src = imageUrl;
+                imagePreview.style.display = 'block';
+
+                alert('รูปถูกอัปโหลดเรียบร้อยแล้ว!');
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                alert('เกิดข้อผิดพลาดในการอัปโหลดรูปภาพ.');
+            }
+        });
+    </script>
+</body>
+</html>

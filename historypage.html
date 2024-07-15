@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Centered Text Box</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+
+    .container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        width: 300px;
+        text-align: center;
+    }
+
+    .input-box {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+        margin-bottom: 10px;
+        box-sizing: border-box; /* Ensure padding is included in width */
+    }
+
+    .submit-button {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 10px; /* Space between textarea and button */
+        font-size: 14px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        width: 100%; /* Ensure button spans full width */
+        box-sizing: border-box; /* Ensure padding is included in width */
+    }
+
+    .submit-button:hover {
+        background-color: #45a049;
+    }
+
+    .exit-button {
+        background-color: #f44336;
+        color: white;
+        border: none;
+        padding: 8px 15px; /* Adjust padding as needed */
+        text-align: center;
+        text-decoration: none;
+        display: block;
+        font-size: 14px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        width: 100%; /* Ensure button spans full width */
+        box-sizing: border-box; /* Ensure padding is included in width */
+    }
+
+    .exit-button:hover {
+        background-color: #d32f2f;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h2>Enter Your Text</h2>
+    <textarea class="input-box" placeholder="Type here..." rows="5"></textarea>
+    <button class="submit-button">Submit</button>
+    <a href="homepage.html" class="exit-button">Exit</a>
+</div>
+</body>
+</html>

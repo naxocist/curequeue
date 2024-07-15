@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paying Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 320px;
+            max-width: 100%;
+            text-align: center;
+        }
+
+        .container h2 {
+            margin-bottom: 20px;
+        }
+
+        .upload-section {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+
+        .upload-section label {
+            font-weight: bold;
+        }
+
+        .upload-section input[type="file"] {
+            margin-top: 5px;
+        }
+
+        .upload-section button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        .upload-section button:hover {
+            background-color: #45a049;
+        }
+    </style>
+    <!-- Include Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>Upload Receipt</h2>
+        <div class="upload-section">
+            <label for="imageSelect">Select Image:</label>
+            <input type="file" id="imageSelect">
+            <button id="uploadButton">Upload</button>
+        </div>
+        <div id="imagePreviewContainer" style="display: none;">
+            <h3>Uploaded Image Preview:</h3>
+            <img id="imagePreview" class="image-preview">
+        </div>
+    </div>
+    <script>
+        // Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyAp8cxB8EE02CYqf0d9KemDlVnUwRgx6No",
+            authDomain: "login-form-596e1.firebaseapp.com",
+            databaseURL: "https://login-form-596e1-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "login-form-596e1",
+            storageBucket: "login-form-596e1.appspot.com",
+            messagingSenderId: "911793008022",
+            appId: "1:911793008022:web:9ffd9fae871a2468f001b7"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Reference to Realtime Database
+        var database = firebase.database();
+
+        // Reference to Storage
+        var storage = firebase.storage();
+
+        // Handle upload button click
+        document.getElementById('uploadButton').addEventListener('click', function() {
+            var file = document.getElementById('imageSelect').files[0];
+            if (file) {
+                var fileName = file.name;
+                var storageRef = storage.ref('bill/' + fileName);
+                var uploadTask = storageRef.put(file);
+
+                // Upload file and update database on successful upload
+                uploadTask.on('state_changed', 
+                    function(snapshot) {
+                        // Progress tracking (optional)
+                    }, 
+                    function(error) {
+                        // Handle unsuccessful uploads
+                        console.error('Error uploading image:', error);
+                        alert('Error uploading image.');
+                    }, 
+                    function() {
+                        // Handle successful upload
+                        uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+                            // Update status in Realtime Database to "ชำระเงินแล้ว"
+                            var bookingKey = localStorage.getItem('currentBookingKey');
+                            if (bookingKey) {
+                                var bookingRef = database.ref('queueBookings/' + bookingKey);
+                                bookingRef.update({
+                                    status: 'ชำระเงินแล้ว',
+                                    imageUrl: downloadURL
+                                }).then(function() {
+                                    // Redirect to finish.html
+                                    window.location.href = 'finish.html';
+                                }).catch(function(error) {
+                                    console.error('Error updating status:', error);
+                                    alert('Error updating status.');
+                                });
+                            } else {
+                                alert('Booking key not found.');
+                            }
+                        });
+                    }
+                );
+            } else {
+                alert('Please select an image to upload.');
+            }
+        });
+        // Handle successful upload
+        uploadTask.on('state_changed', 
+        function(snapshot) {
+            // Progress tracking (optional)
+        }, 
+        function(error) {
+            // Handle unsuccessful uploads
+            console.error('Error uploading image:', error);
+            alert('Error uploading image.');
+        }, 
+        function() {
+            // Handle successful upload
+            uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+                // Update status in Realtime Database to "ชำระเงินแล้ว"
+                var bookingKey = localStorage.getItem('currentBookingKey');
+                if (bookingKey) {
+                    var bookingRef = database.ref('queueBookings/' + bookingKey);
+                    bookingRef.update({
+                        status: 'ชำระเงินแล้ว',
+                        imageUrl: downloadURL
+                    }).then(function() {
+                        // Show uploaded image preview
+                        var imagePreviewContainer = document.getElementById('imagePreviewContainer');
+                        var imagePreview = document.getElementById('imagePreview');
+                        imagePreview.src = downloadURL;
+                        imagePreviewContainer.style.display = 'block';
+
+                        // Redirect to finish.html
+                        window.location.href = 'finish.html';
+                    }).catch(function(error) {
+                        console.error('Error updating status:', error);
+                        alert('Error updating status.');
+                    });
+                } else {
+                    alert('Booking key not found.');
+                }
+            });
+        }
+        );
+
+    </script>
+</body>
+</html>

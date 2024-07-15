@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finish Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            text-align: center;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 320px;
+            max-width: 100%;
+        }
+
+        h1 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        #homeButton {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        #homeButton:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Payment Complete!</h1>
+        <p>Your payment has been processed successfully.</p>
+        <button id="homeButton">Go to Homepage</button>
+    </div>
+
+    <script>
+        document.getElementById('homeButton').addEventListener('click', function() {
+            window.location.href = 'homepage.html';
+        });
+    </script>
+</body>
+</html>

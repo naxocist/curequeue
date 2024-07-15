@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Booking Information</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #e9c4ff, #abf7d7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 700px;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .booking-details {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            position: relative;
+            cursor: pointer; /* Add cursor pointer for clickable effect */
+            transition: background-color 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .booking-details:hover {
+            background-color: #f0f0f0; /* Change background on hover */
+        }
+
+        .booking-details span {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .status-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-left: 10px;
+        }
+
+        .delete-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #f44336;
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .delete-button:hover {
+            background-color: #d32f2f;
+        }
+
+        .exit-button {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .exit-button a {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .exit-button a:hover {
+            background-color: #45a049;
+        }
+        .booking-details .status {
+            font-weight: bold;
+            color: #333;
+        }
+        
+    </style>
+</head>
+<body>
+    <div>
+        <div class="container">
+            <h1>Edit Booking Information</h1>
+            <div id="bookingList" style="overflow:scroll; height:400px;">
+            
+            </div>
+        </div>
+
+        <div class="exit-button">
+            <a href="homedoc.html">ออก</a>
+        </div>
+    </div>
+    <script type="module">
+        // Import the Firebase SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+        import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-database.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAp8cxB8EE02CYqf0d9KemDlVnUwRgx6No",
+            authDomain: "login-form-596e1.firebaseapp.com",
+            databaseURL: "https://login-form-596e1-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "login-form-596e1",
+            storageBucket: "login-form-596e1.appspot.com",
+            messagingSenderId: "911793008022",
+            appId: "1:911793008022:web:9ffd9fae871a2468f001b7"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Reference to your "queueBookings" data
+        const queueBookingsRef = ref(database, 'queueBookings');
+
+        // Function to delete a booking
+        const deleteBooking = (bookingId) => {
+            const bookingRef = ref(database, `queueBookings/${bookingId}`);
+            remove(bookingRef)
+                .then(() => {
+                    console.log(`Booking ${bookingId} deleted successfully.`);
+                })
+                .catch((error) => {
+                    console.error("Error deleting booking: ", error);
+                });
+        };
+
+        // Function to handle navigation to edit page
+        const navigateToEditPage = (bookingId) => {
+            window.location.href = `editbooking.html?bookingId=${bookingId}`;
+        };
+
+        // Get the data and listen for changes
+        onValue(queueBookingsRef, (snapshot) => {
+            const data = snapshot.val();
+            const bookingListContainer = document.getElementById('bookingList');
+            bookingListContainer.innerHTML = '';  // Clear existing content
+
+            // Loop through each bookingId
+            for (let bookingId in data) {
+                if (data.hasOwnProperty(bookingId)) {
+                    const bookingData = data[bookingId];
+
+                    // Create a booking details div for each bookingId
+                    const bookingDetails = document.createElement('div');
+                    bookingDetails.className = 'booking-details';
+
+                    // Populate the booking details
+                    // Populate the booking details
+                    bookingDetails.innerHTML = `
+                    <div>
+                        <span>Name:</span> ${bookingData.name}<br>
+                        <span>Birthdate:</span> ${bookingData.birthdate}<br>
+                        <span>Height:</span> ${bookingData.height}<br>
+                        <span>Weight:</span> ${bookingData.weight}<br>
+                        <span>Symptom:</span> ${bookingData.symptom}<br>
+                        <span class="status">Status:</span> ${bookingData.status ? bookingData.status : 'ไม่มีข้อมูลสถานะ'}
+                    </div>
+                    `;
+
+
+                    // Create status indicator circle
+                    const statusIndicator = document.createElement('div');
+                    statusIndicator.className = 'status-indicator';
+                    if (bookingData.status && bookingData.status === "ชำระเงินแล้ว") {
+                        statusIndicator.style.backgroundColor = 'green';
+                    } else {
+                        statusIndicator.style.backgroundColor = 'red';
+                    }
+
+                    // Create delete button
+                    const deleteButton = document.createElement('button');
+                    deleteButton.className = 'delete-button';
+                    deleteButton.textContent = 'Delete';
+                    deleteButton.onclick = (event) => {
+                        event.stopPropagation(); // Prevent click on details when deleting
+                        deleteBooking(bookingId);
+                    };
+
+                    // Add click event to booking details to navigate to edit page
+                    bookingDetails.onclick = () => navigateToEditPage(bookingId);
+
+                    // Append the status indicator, delete button and booking details to the list
+                    bookingDetails.appendChild(statusIndicator);
+                    bookingDetails.appendChild(deleteButton);
+                    bookingListContainer.appendChild(bookingDetails);
+                }
+            }
+        }, (error) => {
+            console.error("Error fetching data: ", error);
+        });
+    </script>
+</body>
+</html>

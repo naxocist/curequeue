@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homepage</title>
+    <style>
+        /* Resetting default margin and padding */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background:linear-gradient(to right,#e9c4ff,#abf7d7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 700px;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .info {
+            margin-bottom: 15px;
+        }
+
+        .info span {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .info .value {
+            display: flex;
+            margin-left: 10px;
+            color: #666;
+        }
+
+       
+        .button-wrapper {
+            text-align: center;
+            margin-bottom: 10px;
+            display:inline-flex;
+        }
+
+        .button-wrapper a {
+            display: inline-flex;
+            color: #fff;
+            background-color: #4CAF50; /* Green */
+            padding: 8px 15px;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: bold;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+            text-align: right;
+        }
+
+        .button-wrapper a:hover {
+            background-color: #45a049; /* Darker shade of green */
+        }
+        button {
+            color: #fff;
+            background-color: #531f83; /* Facebook blue */
+            padding: 8px 15px;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display:inline-flex;
+            margin: 20px auto 10px;
+        }
+        button:hover {
+            background-color: #4a175a; /* Slightly darker shade of blue */
+        }
+    </style>
+    <script type="module" src="./homepage.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Cure-Queue</h1>
+        <div class="info">
+            <span>ชื่อจริง:</span>
+            <span id="loggedUserFName" class="value"></span>
+        </div>
+        <div class="info">
+            <span> นามสกุล:</span>
+            <span id="loggedUserLName" class="value"></span>
+       </div>
+        <div class="info">
+            <span>อีเมล:</span>
+            <span id="loggedUserEmail" class="value"></span>
+       
+       <div class="button-wrapper">
+            <a href="bookpage.html">การจองคิว</a> 
+        </div>
+        <div class="button-wrapper">
+            <a href="historypage.html">ประวัติ</a> 
+        </div>
+        <div class="button-wrapper">
+            <a href="advicepage.html">คำแนะนำ</a> 
+        </div>
+        <div class="button-wrapper">
+            <a href="profilepage.html">ข้อมูลผู้ใช้งาน</a> 
+        </div>
+        <button id="logout">ออกจากระบบ</button>
+        </div>
+    </div>
+</body>
+</html>
